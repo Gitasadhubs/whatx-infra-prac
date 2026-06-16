@@ -1,13 +1,20 @@
 FROM node:18-alpine
 
-WORKDIR /backend
+WORKDIR /app
 
-COPY package*.json .
+# Copy package files and install dependencies
+COPY package*.json ./
+RUN npm ci --omit=dev
 
-RUN npm install
-
+# Copy source code
 COPY . .
 
-EXPOSE 5000
+# Expose the port the app listens on (default 10000)
+EXPOSE 10000
 
-CMD ["node", "server.js"]   
+# Set environment variables
+ENV NODE_ENV=production
+ENV PORT=10000
+
+# Start the application
+CMD ["npm", "start"]

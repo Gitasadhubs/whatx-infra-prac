@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./WhatsX-Advanced-WhatsApp-Messaging-Automation/backend
+      dockerfile: Dockerfile
+    ports:
+      - "10000:10000"
+    environment:
+      - NODE_ENV=production
+    depends_on:
+      - email-api
+
+  frontend:
+    build:
+      context: ./WhatsX-Advanced-WhatsApp-Messaging-Automation/frontend
+      dockerfile: Dockerfile
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+
+  email-api:
+    build:
+      context: ./WhatsX-Advanced-WhatsApp-Messaging-Automation/email-api
+      dockerfile: Dockerfile
+    ports:
+      - "5001:5001"
+    environment:
+      - NODE_ENV=production

@@ -1,0 +1,53 @@
+name: CI Pipeline
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Test
+        run: npm test
+
+      - name: Build
+        run: npm run build
+
+      - name: Log in to Azure Container Registry
+        uses: azure/docker-login@v1
+        with:
+          login-server: ${{ secrets.ACR_LOGIN_SERVER }}
+          username: ${{ secrets.ACR_USERNAME }}
+          password: ${{ secrets.ACR_PASSWORD }}
+
+      - name: Build and push backend image
+        run: |
+          docker build -t ${{ secrets.ACR_LOGIN_SERVER }}/whatsx-backend:latest ./WhatsX-Advanced-WhatsApp-Messaging-Automation/backend
+          docker push ${{ secrets.ACR_LOGIN_SERVER }}/whatsx-backend:latest
+
+      - name: Build and push frontend image
+        run: |
+          docker build -t ${{ secrets.ACR_LOGIN_SERVER }}/whatsx-frontend:latest ./WhatsX-Advanced-WhatsApp-Messaging-Automation/frontend
+          docker push ${{ secrets.ACR_LOGIN_SERVER }}/whatsx-frontend:latest
+
+      - name: Build and push email API image
+        run: |
+          docker build -t ${{ secrets.ACR_LOGIN_SERVER }}/whatsx-email-api:latest ./WhatsX-Advanced-WhatsApp-Messaging-Automation/email-api
+          docker push ${{ secrets.ACR_LOGIN_SERVER }}/whatsx-email-api:latest

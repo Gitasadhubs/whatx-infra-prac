@@ -1,13 +1,20 @@
 FROM node:18-alpine
 
-WORKDIR /email-api
+WORKDIR /app
 
-COPY package*.json .
+# Install dependencies
+COPY package*.json ./
+RUN npm ci --omit=dev
 
-RUN npm install
-
+# Copy source code
 COPY . .
 
+# Expose the email API port (default 5001)
 EXPOSE 5001
 
-CMD ["node", "server.js"]
+# Set environment variables
+ENV NODE_ENV=production
+ENV PORT=5001
+
+# Start the service
+CMD ["npm", "start"]
